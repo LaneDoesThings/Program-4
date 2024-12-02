@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+use File::Type;
+use File::Path 'rmtree';
 
 if (@ARGV)
 { 
@@ -12,7 +14,21 @@ else
 }
 foreach $file (@file_list)
 {
-    print("delete $file? [y,Q] ");
+    $ft = File::Type->new();
+    $file_type = $ft->mime_type($file);
+    if($file_type eq 'application/octet-stream')
+    {
+        $file_type_name = "text file";
+    }
+    elsif($file_type eq 'application/x-executable-file')
+    {
+        $file_type_name = "binary file";
+    }
+    elsif(!$file_type)
+    {
+        $file_type_name = "directory";
+    }
+    print("delete $file_type_name $file? [y,Q] ");
     $input = <STDIN>;
 
     if(lc($input) =~ "y")
@@ -28,5 +44,24 @@ print("About to delete:\n");
 print(join(", ", @to_delete));
 print ("\ncomplete all deletions? [y,N]: ");
 $input = <STDIN>;
-#DO THE STUFF HERE
+if(lc($input) =~ "y")
+{
+    foreach $file (@to_delete)
+    {
+        $file_type = $ft->mime_type($file);
+        if(!$file_type)
+        {
+            rmtree($file);
+        }
+        else
+        {
+            unlink $file;
+        }
+    }
+}
+else
+{
+    print("Nothing has been deleted.\n");
+    exit 0;
+}
 exit 0;
