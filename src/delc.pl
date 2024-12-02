@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
-use File::Type;
-use File::Path 'rmtree';
+use File::Type; #For checking file type
+use File::Path 'rmtree'; #For deleting files
 
 if (@ARGV)
 { 
@@ -14,18 +14,21 @@ else
 }
 foreach $file (@file_list)
 {
+    #File doesn't exist so give error
     if(!-e $file)
     {
         print("ERROR: cannot find $file\n");
         exit 1;
     }
+
+    #Get the file type of the file
     $ft = File::Type->new();
     $file_type = $ft->mime_type($file);
-    if(!$file_type)
+    if(!$file_type) #if undef then a directory
     {
         $file_type_name = "directory";
     }
-    else
+    else #otherwise a file of somekind
     {
         $file_type_name = "file";
     }
@@ -49,6 +52,7 @@ if(lc($input) =~ "y")
 {
     foreach $file (@to_delete)
     {
+        #if a directory delete with rmtree otherwise a file so use unlink
         $file_type = $ft->mime_type($file);
         if(!$file_type)
         {
