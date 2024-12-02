@@ -14,19 +14,20 @@ else
 }
 foreach $file (@file_list)
 {
+    if(!-e $file)
+    {
+        print("ERROR: cannot find $file\n");
+        exit 1;
+    }
     $ft = File::Type->new();
     $file_type = $ft->mime_type($file);
-    if($file_type eq 'application/octet-stream')
-    {
-        $file_type_name = "text file";
-    }
-    elsif($file_type eq 'application/x-executable-file')
-    {
-        $file_type_name = "binary file";
-    }
-    elsif(!$file_type)
+    if(!$file_type)
     {
         $file_type_name = "directory";
+    }
+    else
+    {
+        $file_type_name = "file";
     }
     print("delete $file_type_name $file? [y,Q] ");
     $input = <STDIN>;
